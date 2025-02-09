@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Slider
 
 # Открываем файл на чтение
-file_name = "/home/plutosdr/Desktop/ia232/sdr/test1/sdrLessons/build/txdata_bark.pcm"
+file_name = "D:\\Github\\sdr_practice\\gardner\\data\\txdata.pcm"
 # file_name = "/home/plutosdr/Desktop/ia232/sdr/samples/data/txdata123.pcm"
 # file_name = "D:\\Github\\another task\\sdr\\samples\\data\\txdata_bark.pcm"
 
@@ -24,7 +24,7 @@ q_ = q
 i = i / max(abs(i))
 q = q / max(abs(q))
 
-
+# свёртка с фильтром
 filter = np.ones(10)
 i = np.convolve(i,filter,mode='same')
 q = np.convolve(q,filter,mode='same')
@@ -37,6 +37,7 @@ plt.plot(q)
 plt.plot(i_,color = "green")
 plt.plot(q_,color = "purple")
 
+# Отрисовка сдвигов
 count = 0
 plt.figure(2, figsize=(16,16))
 for it in range(1,11):

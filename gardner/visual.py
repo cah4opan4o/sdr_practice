@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Открываем файл на чтение
-file_name = "D:\\Github\\another task\\sdr\\samples\\data\\txdata123.pcm"
+file_name = "D:\\Github\\sdr_practice\\gardner\\data\\txdata.pcm"
 # file_name = "D:\\Github\\another task\\sdr\\samples\\data\\txdata_bark.pcm"
 dtype = np.int16
 with open(file_name, "rb") as file:
