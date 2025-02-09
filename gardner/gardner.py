@@ -43,14 +43,13 @@ def gardner_timing_recovery(I, Q, Nsps, BnTs=0.01, zeta=1.0, Kp=1.0):
     offset = 0  # Начальное смещение
     recovered_I = []
     recovered_Q = []
-    sample_indices = [] # Хранение индексов, которые мы взяли
     
     for n in range(len(I) - 2 * Nsps):
         e = (I[n + Nsps - Nsps] - I[n + Nsps]) * \
             (Q[n + Nsps // 2 + Nsps] - Q[n + Nsps // 2 - Nsps])
         
         # Обновление p1, p2
-        p1 += e * K1
+        p1 = e * K1
         p2 += p1 + e * K2
         
         # Коррекция задержки
@@ -67,9 +66,8 @@ def gardner_timing_recovery(I, Q, Nsps, BnTs=0.01, zeta=1.0, Kp=1.0):
         if 0 <= sample_index < len(I):
             recovered_I.append(I[sample_index])
             recovered_Q.append(Q[sample_index])
-            sample_indices.append(sample_index)
     
-    return np.array(recovered_I), np.array(recovered_Q), np.array(sample_indices)
+    return np.array(recovered_I), np.array(recovered_Q)
 
 
 
@@ -115,7 +113,7 @@ if __name__ == "__main__":
     plt.title("QPSK before Gardner")
 
     # /////////////////////////////////////////////////////////////////////////
-    output_I, output_Q, sample_indices = gardner_timing_recovery(I, Q, Nsp) # Nsp = Nsps
+    output_I, output_Q = gardner_timing_recovery(I, Q, Nsp) # Nsp = Nsps
     # /////////////////////////////////////////////////////////////////////////
     
     # QPSK after Gardner
