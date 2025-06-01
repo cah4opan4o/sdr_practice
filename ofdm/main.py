@@ -4,14 +4,61 @@ from scipy.fftpack import fft , ifft , fftshift
 import scipy.interpolate
 
 # Функция символьной синхронизации
-def symbol_synchronization(signal, guard_interval_len):
+# def symbol_synchronization(signal, guard_interval_len):
+#     correlation = []
+#     for i in range(len(signal) - guard_interval_len):
+#         similarity = np.linalg.norm(signal[i:i + guard_interval_len] - guard_interval)
+#         correlation.append(similarity)
+#         if np.allclose(signal[i:i + guard_interval_len], guard_interval, atol=1e-6):
+#             return i, correlation  # Возвращаем индекс начала основного сигнала и корреляцию
+#     return -1, correlation  # Если не найдено
+
+import numpy as np
+
+def calculate_correlation(x, y):
+    if len(x) != len(y) or len(x) == 0:
+        raise ValueError("Векторы имеют разную длину или пустые!")
+
+    mean_x = sum(x) / len(x)
+    mean_y = sum(y) / len(y)
+
+    numerator = 0.0
+    denominator_x = 0.0
+    denominator_y = 0.0
+
+    for xi, yi in zip(x, y):
+        dx = xi - mean_x
+        dy = yi - mean_y
+        numerator += dx * dy
+        denominator_x += dx * dx
+        denominator_y += dy * dy
+
+    if denominator_x == 0 or denominator_y == 0:
+        return 0.0  # лучше вернуть 0, чем выбрасывать исключение в сигнале
+
+    return numerator / np.sqrt(denominator_x * denominator_y)
+
+def symbol_synchronization(signal, guard_interval_len, threshold=0.99):
     correlation = []
-    for i in range(len(signal) - guard_interval_len):
-        similarity = np.linalg.norm(signal[i:i + guard_interval_len] - guard_interval)
-        correlation.append(similarity)
-        if np.allclose(signal[i:i + guard_interval_len], guard_interval, atol=1e-6):
-            return i, correlation  # Возвращаем индекс начала основного сигнала и корреляцию
-    return -1, correlation  # Если не найдено
+    sync_index = []
+
+    signal_len = len(signal)
+    max_offset = signal_len - 2 * guard_interval_len
+
+    for i in range(max_offset):
+        first_part = signal[i : i + guard_interval_len]
+        second_part = signal[i + guard_interval_len : i + 2 * guard_interval_len]
+
+        if len(second_part) < guard_interval_len:
+            break
+
+        corr = calculate_correlation(first_part, second_part)
+        correlation.append(corr)
+
+        if corr >= threshold:
+            sync_index.append(i)
+
+    return sync_index, correlation
 
 T = 1 * np.e**(-4)  # Длительность символа
 Nc = 64  # Количество поднесущих
